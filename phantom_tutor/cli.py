@@ -30,6 +30,10 @@ def main(argv: list[str] | None = None) -> int:
     d.add_argument("--id", required=True)
     d.add_argument("--answer", required=True)
 
+    iv = sub.add_parser("interview", help="LLM mock interviewer (reads your weak spots)")
+    iv.add_argument("--focus", default="general")
+    iv.add_argument("--answer", required=True)
+
     args = p.parse_args(argv)
     now = _now(args)
 
@@ -49,5 +53,10 @@ def main(argv: list[str] | None = None) -> int:
         from .modes import design
         res = design.run_design(args.id, args.answer, now)
         print(f"[{res['item']['topic']}] score={res['score']:.2f}\nFEEDBACK: {res['feedback']}")
+        return 0
+    if args.cmd == "interview":
+        from .modes import interview
+        res = interview.run_interview(args.focus, args.answer, now)
+        print(f"Q: {res['question']}\nscore={res['score']:.2f}  FEEDBACK: {res['feedback']}")
         return 0
     return 1
