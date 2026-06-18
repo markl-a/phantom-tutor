@@ -1,3 +1,7 @@
+> ARCHIVED 2026-06-19 — frozen historical snapshot; current status lives in [/ROADMAP.md](../../ROADMAP.md)
+>
+> This Phase-1 plan has fully shipped (merged `14c4cc0`). It is kept for provenance only.
+
 # phantom-tutor Phase-1 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
