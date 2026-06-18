@@ -1,0 +1,3 @@
+[
+  {"id": "d-rag", "topic": "rag-system", "dimension": "system-design", "prompt": "Design a RAG assistant over a company wiki.", "rubric": ["data/ingestion+chunking", "embeddings+retrieval+rerank", "serving/latency", "eval+monitoring"]}
+]

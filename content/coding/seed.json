@@ -1,0 +1,4 @@
+[
+  {"id": "c-add", "topic": "basics", "prompt": "Implement add(a, b) returning a+b.", "tests": "from solution import add\ndef test_a():\n    assert add(2,3)==5\ndef test_b():\n    assert add(-1,1)==0\n"},
+  {"id": "c-softmax", "topic": "softmax", "prompt": "Implement softmax(xs) (list of floats) -> list summing to 1.", "tests": "from solution import softmax\ndef test_sum():\n    assert abs(sum(softmax([1.0,2.0,3.0]))-1.0)<1e-6\n"}
+]

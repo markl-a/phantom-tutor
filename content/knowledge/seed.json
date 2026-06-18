@@ -1,0 +1,4 @@
+[
+  {"id": "k-softmax", "topic": "softmax", "dimension": "ML", "question": "Why subtract max(x) before exp in softmax?", "answer": "numerical stability", "keywords": ["stability", "overflow", "max"]},
+  {"id": "k-rag", "topic": "rag", "dimension": "LLM", "question": "What problem does RAG address?", "answer": "grounding/hallucination via retrieval", "keywords": ["retrieval", "grounding", "hallucination", "context"]}
+]
