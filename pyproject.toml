@@ -1,0 +1,15 @@
+[project]
+name = "phantom-tutor"
+version = "0.1.0"
+description = "Personal study assistant on phantom-mesh core"
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["phantom_tutor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
