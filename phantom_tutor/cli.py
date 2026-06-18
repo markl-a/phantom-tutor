@@ -21,6 +21,8 @@ def main(argv: list[str] | None = None) -> int:
     q = sub.add_parser("quiz", help="knowledge SRS quiz")
     q.add_argument("--id", required=True)
     q.add_argument("--answer", required=True)
+    q.add_argument("--llm", action="store_true",
+                   help="grade the free-text answer via the LLM instead of keyword overlap")
 
     c = sub.add_parser("code", help="coding problem graded by unit tests")
     c.add_argument("--id", required=True)
@@ -43,9 +45,11 @@ def main(argv: list[str] | None = None) -> int:
     now = _now(args)
 
     if args.cmd == "quiz":
-        res = knowledge.run_quiz(args.id, args.answer, now)
+        res = knowledge.run_quiz(args.id, args.answer, now, use_llm=args.llm)
         print(f"[{res['item']['topic']}] score={res['score']:.2f}  "
               f"mastery={res['record']['mastery']:.2f}  next due {res['record']['due']}")
+        if args.llm and res.get("feedback"):
+            print(f"FEEDBACK: {res['feedback']}")
         return 0
     if args.cmd == "code":
         from .modes import coding
