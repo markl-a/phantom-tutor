@@ -22,6 +22,10 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("--id", required=True)
     q.add_argument("--answer", required=True)
 
+    c = sub.add_parser("code", help="coding problem graded by unit tests")
+    c.add_argument("--id", required=True)
+    c.add_argument("--solution", required=True)
+
     args = p.parse_args(argv)
     now = _now(args)
 
@@ -29,5 +33,12 @@ def main(argv: list[str] | None = None) -> int:
         res = knowledge.run_quiz(args.id, args.answer, now)
         print(f"[{res['item']['topic']}] score={res['score']:.2f}  "
               f"mastery={res['record']['mastery']:.2f}  next due {res['record']['due']}")
+        return 0
+    if args.cmd == "code":
+        from .modes import coding
+        res = coding.run_code_problem(args.id, args.solution, now)
+        r = res["result"]
+        print(f"[{res['item']['topic']}] passed={r['passed']}/{r['total']} "
+              f"score={r['score']:.2f}  mastery={res['record']['mastery']:.2f}")
         return 0
     return 1
