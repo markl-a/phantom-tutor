@@ -26,6 +26,10 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--id", required=True)
     c.add_argument("--solution", required=True)
 
+    d = sub.add_parser("design", help="system-design answer graded by LLM rubric")
+    d.add_argument("--id", required=True)
+    d.add_argument("--answer", required=True)
+
     args = p.parse_args(argv)
     now = _now(args)
 
@@ -40,5 +44,10 @@ def main(argv: list[str] | None = None) -> int:
         r = res["result"]
         print(f"[{res['item']['topic']}] passed={r['passed']}/{r['total']} "
               f"score={r['score']:.2f}  mastery={res['record']['mastery']:.2f}")
+        return 0
+    if args.cmd == "design":
+        from .modes import design
+        res = design.run_design(args.id, args.answer, now)
+        print(f"[{res['item']['topic']}] score={res['score']:.2f}\nFEEDBACK: {res['feedback']}")
         return 0
     return 1
