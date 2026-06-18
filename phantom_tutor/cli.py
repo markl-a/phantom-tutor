@@ -35,6 +35,8 @@ def main(argv: list[str] | None = None) -> int:
     iv = sub.add_parser("interview", help="LLM mock interviewer (reads your weak spots)")
     iv.add_argument("--focus", default="general")
     iv.add_argument("--answer", required=True)
+    iv.add_argument("--turns", type=int, default=1,
+                    help="run an N-turn mock interview (>1 = multi-turn follow-ups)")
 
     sub.add_parser("today", help="what to review now (SRS due, weakest first)")
     wk = sub.add_parser("weak-spots", help="weakest topics")
@@ -65,8 +67,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "interview":
         from .modes import interview
-        res = interview.run_interview(args.focus, args.answer, now)
-        print(f"Q: {res['question']}\nscore={res['score']:.2f}  FEEDBACK: {res['feedback']}")
+        if args.turns <= 1:
+            res = interview.run_interview(args.focus, args.answer, now)
+            print(f"Q: {res['question']}\nscore={res['score']:.2f}  FEEDBACK: {res['feedback']}")
+            return 0
+        res = interview.run_interview_session(args.focus, args.answer, now, turns=args.turns)
+        for r in res["rounds"]:
+            print(f"Q{r['turn']}: {r['question']}")
+        print(f"session score={res['score']:.2f}  FEEDBACK: {res['feedback']}")
         return 0
     if args.cmd == "today":
         due = memory.due_topics(now)
