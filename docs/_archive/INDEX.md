@@ -1,3 +1,5 @@
+> ARCHIVED 2026-06-19 — 內容已併入 docs/phantom-tutor.md;此為歷史版本。
+
 # Documentation Index
 
 Single navigation entry for phantom-tutor's knowledge base. Every doc in the repo is

@@ -1,3 +1,5 @@
+> ARCHIVED 2026-06-19 — 內容已併入 docs/phantom-tutor.md;此為歷史版本。
+
 # Roadmap
 
 > Single source of truth for project status. Date-stamped **2026-06-19**.

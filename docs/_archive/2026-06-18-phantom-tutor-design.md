@@ -1,3 +1,5 @@
+> ARCHIVED 2026-06-19 — 內容已併入 docs/phantom-tutor.md;此為歷史版本。
+
 # phantom-tutor — 設計 / Design Spec
 
 > 日期:2026-06-18 · 狀態:設計(已與 operator brainstorm 定案,待 review)
