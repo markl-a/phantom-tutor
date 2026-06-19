@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Personal study assistant on phantom-mesh core"
 requires-python = ">=3.11"
 
+[project.scripts]
+tutor = "phantom_tutor.cli:main"
+
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
