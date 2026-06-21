@@ -1,4 +1,17 @@
-from phantom_tutor import memory
+import json
+
+from phantom_tutor import memory, paths
+
+
+def test_record_attempt_appends_to_attempts_log():
+    memory.record_attempt("transformer", "ML", score=0.4, now_iso="2026-06-12")
+    memory.record_attempt("transformer", "ML", score=1.0, now_iso="2026-06-13")
+    lines = paths.attempts_path().read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 2                       # one append-only line per attempt
+    first, second = json.loads(lines[0]), json.loads(lines[1])
+    assert first == {"key": "transformer", "dimension": "ML",
+                     "score": 0.4, "at": "2026-06-12"}
+    assert second["score"] == 1.0 and second["at"] == "2026-06-13"
 
 
 def test_record_attempt_persists_and_updates_mastery_and_due():

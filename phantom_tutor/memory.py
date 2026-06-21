@@ -44,7 +44,18 @@ def record_attempt(key: str, dimension: str, score: float, now_iso: str,
     rec["due"] = (date.fromisoformat(now_iso) + timedelta(days=interval)).isoformat()
     store[key] = rec
     save_store(store, path)
+    _append_attempt(key, dimension, float(score), now_iso)
     return {"key": key, **rec}
+
+
+def _append_attempt(key: str, dimension: str, score: float, now_iso: str) -> None:
+    """Append one append-only attempt line (review history; feeds future FSRS)."""
+    p = paths.attempts_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps({"key": key, "dimension": dimension, "score": score, "at": now_iso},
+                      ensure_ascii=False)
+    with p.open("a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
 
 def due_topics(now_iso: str, path: Path | None = None) -> list[dict]:
