@@ -81,4 +81,13 @@
 - 合成 CSV(含 1 筆年薪、1 筆月薪、1 筆面議、1 筆 agency)→ `import-104` 寫出正確 jobs.json,薪資正規化正確,agency 不在內。
 - `operator_skills.json` 不存在時被寫成空範本。
 - ruff clean、既有 48 測試 + 新測試全綠。
-- **(operator 手動驗收)**:對真實 `104_ai_jobs_matched_v2_20260618.csv` 跑 import-104 + 填 profile → `tutor today` 排出真實 gap、`rank` top-N 符合直覺(交叉比對 05 §2.3 的 top5:南亞科/工研院/鴻海/華碩在前段)。
+- **(operator 手動驗收)**:對真實 `104_ai_jobs_matched_v2_20260618.csv` 跑 import-104 + 填 profile → `tutor today` 排出真實 gap、`rank` top-N 符合直覺。
+
+## 真實資料 run 觀察 + R2 待校準(2026-06-21,200 筆 → 199 ingested)
+
+R0 已達成:200 筆選樣、ingest、四訊號可在真實資料上跑;real-run 當場抓到並修掉 `代招/代徵/獵才` bait 漏濾。以下留給 **R2(真用後校準)**,**非 R0 阻塞**:
+
+- **rank 頂端偏 quant/infra/Director**:忠於 04 §2.3 四軸設計——dream/量化叢集 raw 分高但 `W4=1`,operator 靠 **W4 欄**區分主投(W4≥3)vs 練習池(W4=1)。R2 可選:加 `dream_companies` 手動覆寫,或調 W4 權重讓 dream 壓制更強。
+- **BIG_COMPANIES 子字串可能過擬合**(real-run big 167/199,05 為 154/200):英文 token 如 `Intel` 會誤中 `Intelligent`、`LINE` 誤中含 line 字樣。R2:改全詞比對或收斂名表。
+- **demand 混合 skills_norm + themes**:故 `llm` 居首(171)而非 05 skill-tag-only 的 `python` 居首。這是刻意的(themes=可練概念),但與 05 的純 skill-tag 視角不同,文件化即可。
+- **salary 月薪正規化用 ≥300k 閾值**:極少數高月薪職(>25萬/月)會被誤判年薪 /12。可接受的啟發式。
