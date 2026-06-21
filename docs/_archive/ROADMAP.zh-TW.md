@@ -49,15 +49,15 @@ flowchart LR
 
 ## ③ 分期表
 
-> 開發模型：**單人多機**（z13 編排 · M5/M1 Mac · acer/ayaneo 跑 Rust · Android worker）；
+> 開發模型：**單人多機**（編排節點(Win)編排 · Mac 節點 · Win 節點跑 Rust · Android worker）；
 > **寫**=codex/claude，**審**≥2 個 distinct-AI，**governor + 雙閘 → 手機**。
 > 排序：💰 便宜高值先 → 🏰 護城河先 → 🙋 需操作者決策後。
 
 | 階段 | 🎯 目標 | 具體項（grounded） | 🖥️ 在哪台機 + 哪 AI | ⚠️ 風險前置 |
 |---|---|---|---|---|
-| 🚧 **一**<br/>(💰便宜高值) | 把資源排程從手刻升級到業界標準 | • ⭐ `srs.py` 手刻 SM-2-lite → **adopt py-fsrs(MIT)**,走既有 `next_interval_days`/`is_due` 接縫,additive | z13 編排;codex 寫(單檔機械改)·opencode/agy 審 | py-fsrs 是新依賴 → 先確認 pin 版本、保留 stub 測試 hermetic;swap 必須 byte-compatible 預設行為 |
-| 📅 **二**<br/>(🏰護城河旗艦) | 弱點記憶上鏈,長 session 受治理 | • ⭐ `memory.py` 後端從本地 JSON → **phantom core owned-memory**(加密/跨裝置/廠商看不到)<br/>• 🛡️ 長 interview/grading session 包進 `phantom govern`;重批改 `phantom dispatch` 到 GPU 節點 | z13 編排接 core;Rust 整合驗證走 acer/ayaneo;claude 寫接線 · ≥2 AI 審 | 🙋 **需操作者決策**:owned-memory schema/key 對接點;**絕不寫真 `~/.phantom-mesh`**,測試一律 tmp + stub |
-| 🔭 **三**<br/>(🙋用過再深化) | 真用之後才補的深度 | • 評分品質(LLM 自由作答 / RAGAS 式 judge rubric 參考)<br/>• coding 提示分級 + 複雜度回饋;design 參考架構庫;interview 追問深度/語氣<br/>• 📊 進度視覺化 | z13 編排;模式各自 codex/claude 寫 · ≥2 AI 審;Android worker 可跑批改 | 🚩 **別在真用證明缺口前深化**(見 ④);模式現在薄是**刻意的** |
+| 🚧 **一**<br/>(💰便宜高值) | 把資源排程從手刻升級到業界標準 | • ⭐ `srs.py` 手刻 SM-2-lite → **adopt py-fsrs(MIT)**,走既有 `next_interval_days`/`is_due` 接縫,additive | 編排節點(Win);codex 寫(單檔機械改)·opencode/agy 審 | py-fsrs 是新依賴 → 先確認 pin 版本、保留 stub 測試 hermetic;swap 必須 byte-compatible 預設行為 |
+| 📅 **二**<br/>(🏰護城河旗艦) | 弱點記憶上鏈,長 session 受治理 | • ⭐ `memory.py` 後端從本地 JSON → **phantom core owned-memory**(加密/跨裝置/廠商看不到)<br/>• 🛡️ 長 interview/grading session 包進 `phantom govern`;重批改 `phantom dispatch` 到 GPU 節點 | 編排節點(Win)接 core;Rust 整合驗證走 Win 節點;claude 寫接線 · ≥2 AI 審 | 🙋 **需操作者決策**:owned-memory schema/key 對接點;**絕不寫真 `~/.phantom-mesh`**,測試一律 tmp + stub |
+| 🔭 **三**<br/>(🙋用過再深化) | 真用之後才補的深度 | • 評分品質(LLM 自由作答 / RAGAS 式 judge rubric 參考)<br/>• coding 提示分級 + 複雜度回饋;design 參考架構庫;interview 追問深度/語氣<br/>• 📊 進度視覺化 | 編排節點(Win);模式各自 codex/claude 寫 · ≥2 AI 審;Android worker 可跑批改 | 🚩 **別在真用證明缺口前深化**(見 ④);模式現在薄是**刻意的** |
 
 ---
 

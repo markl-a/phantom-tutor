@@ -2,6 +2,7 @@
 name = "phantom-tutor"
 version = "0.1.0"
 description = "Personal study assistant on phantom-mesh core"
+license = "Apache-2.0"
 requires-python = ">=3.11"
 
 [project.scripts]

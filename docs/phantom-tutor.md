@@ -119,7 +119,7 @@ flowchart LR
 
 > 排序原則:① **便宜高值優先** ② **護城河優先於廣度** ③ 需操作者決策/真錢/對外動作的**排後並標明** ④ 明列**刻意不做**。
 > 每個「已出貨」項對應 `master` 上的真實 commit;階段一/二/三的**具體選型**(py-fsrs / JobSpy / Resume-Matcher)屬下方〈開源生態與方向〉的**建議路線**(候選方向),非已鎖定承諾。
-> 開發模型:**單人多機**(z13 編排 · M5/M1 Mac · acer/ayaneo 跑 Rust · Android worker);**寫**=codex/claude,**審**≥2 個 distinct-AI,**governor + 雙閘 → 手機**。
+> 開發模型:**單人多機**(編排節點(Win)編排 · Mac 節點 · Win 節點跑 Rust · Android worker);**寫**=codex/claude,**審**≥2 個 distinct-AI,**governor + 雙閘 → 手機**。
 
 ### 狀態總覽(Mermaid)
 
@@ -166,23 +166,23 @@ flowchart LR
 
 | 目標 | 具體項 | 在哪做 | 風險 / 前置 |
 |---|---|---|---|
-| ⭐ wealth-score | 讀既有 scored-jobs CSV(命中分)**之上**疊一層四軸(薪資天花板 × 耐久性 × 既有槓桿 × 契合)薄評分函式;純讀 CSV + 評分函式,零爬取/零對外/零 ToS | z13 編排;codex/claude 寫 · ≥2 AI 審 | 低。純加法。**別過度工程**——先用真實求職證明有用再談 LLM 細化 |
-| ⭐ FSRS 換手刻 SM-2 | `srs.py` 手刻 SM-2-lite → **adopt py-fsrs(MIT)**,走既有 `next_interval_days`/`is_due` 接縫,additive | z13 編排;codex 寫(單檔機械改)· opencode/agy 審 | 低。py-fsrs 是新依賴 → 先 pin 版本、保留 stub 測試 hermetic;swap 須 byte-compatible 預設行為 |
+| ⭐ wealth-score | 讀既有 scored-jobs CSV(命中分)**之上**疊一層四軸(薪資天花板 × 耐久性 × 既有槓桿 × 契合)薄評分函式;純讀 CSV + 評分函式,零爬取/零對外/零 ToS | 編排節點(Win);codex/claude 寫 · ≥2 AI 審 | 低。純加法。**別過度工程**——先用真實求職證明有用再談 LLM 細化 |
+| ⭐ FSRS 換手刻 SM-2 | `srs.py` 手刻 SM-2-lite → **adopt py-fsrs(MIT)**,走既有 `next_interval_days`/`is_due` 接縫,additive | 編排節點(Win);codex 寫(單檔機械改)· opencode/agy 審 | 低。py-fsrs 是新依賴 → 先 pin 版本、保留 stub 測試 hermetic;swap 須 byte-compatible 預設行為 |
 
 ### 📅 階段二 — 護城河旗艦(排後,牽涉 core 整合)
 
 | 目標 | 具體項 | 在哪做 | 風險 / 前置 |
 |---|---|---|---|
-| ⭐ 真 owned-memory backend | `memory.py` 後端從本地 JSON → **phantom core owned-memory**(Hermes/FTS5,加密/跨裝置/廠商看不到)。同介面、換實作,是後端重新接線非重寫 | z13 編排接 core;Rust 整合驗證走 acer/ayaneo;claude 寫接線 · ≥2 AI 審 | 🙋 **需操作者決策**:owned-memory schema/key 對接點;**絕不寫真 `~/.phantom-mesh`**,測試一律 tmp + stub。這是頭條 apex-② moat,**ROADMAP Planned-next 尚未實作** |
-| 🛡️ governor / mesh 整合 | 長 interview/grading session 包進 `phantom govern`;重批改 `phantom dispatch` 到 GPU 節點 | acer/ayaneo;高風險變更走雙閘 | 中。apex-④ 受治理差異化點 |
+| ⭐ 真 owned-memory backend | `memory.py` 後端從本地 JSON → **phantom core owned-memory**(Hermes/FTS5,加密/跨裝置/廠商看不到)。同介面、換實作,是後端重新接線非重寫 | 編排節點(Win)接 core;Rust 整合驗證走 Win 節點;claude 寫接線 · ≥2 AI 審 | 🙋 **需操作者決策**:owned-memory schema/key 對接點;**絕不寫真 `~/.phantom-mesh`**,測試一律 tmp + stub。這是頭條 apex-② moat,**ROADMAP Planned-next 尚未實作** |
+| 🛡️ governor / mesh 整合 | 長 interview/grading session 包進 `phantom govern`;重批改 `phantom dispatch` 到 GPU 節點 | Win 節點;高風險變更走雙閘 | 中。apex-④ 受治理差異化點 |
 
 ### 🔭 階段三 — 用過再深化 + 受治理的對外(最後)
 
 | 目標 | 具體項 | 在哪做 | 風險 / 前置 |
 |---|---|---|---|
-| 📚 模式深化 | 評分品質(LLM 自由作答 / RAGAS 式 judge rubric 參考);coding 提示分級 + 複雜度回饋;design 參考架構庫;interview 追問深度/語氣 | z13;模式各自 codex/claude 寫 · ≥2 AI 審;Android worker 可跑批改 | 🚩 **別在真用證明缺口前深化**——模式現在薄是**刻意的** |
-| 🌐 受治理的對外取得 | JobSpy 海外板限速爬取 + companion 投遞時效追蹤,**全部經 governor + 手機核准** | acer/ayaneo;操作者決策 + 手機核准 | 🔴 高(對外動作)。爬取有 ToS 風險 → 低頻、個人用、治理化。**先把前幾步用熟、確認落差再做這步** |
-| 📊 進度視覺化 | 跨模式進度/弱點趨勢視覺化 | z13 | 低。願景項 |
+| 📚 模式深化 | 評分品質(LLM 自由作答 / RAGAS 式 judge rubric 參考);coding 提示分級 + 複雜度回饋;design 參考架構庫;interview 追問深度/語氣 | 編排節點(Win);模式各自 codex/claude 寫 · ≥2 AI 審;Android worker 可跑批改 | 🚩 **別在真用證明缺口前深化**——模式現在薄是**刻意的** |
+| 🌐 受治理的對外取得 | JobSpy 海外板限速爬取 + companion 投遞時效追蹤,**全部經 governor + 手機核准** | Win 節點;操作者決策 + 手機核准 | 🔴 高(對外動作)。爬取有 ToS 風險 → 低頻、個人用、治理化。**先把前幾步用熟、確認落差再做這步** |
+| 📊 進度視覺化 | 跨模式進度/弱點趨勢視覺化 | 編排節點(Win) | 低。願景項 |
 
 > 圖例:✅ 已出貨 ｜ 🚧 進行中/近期 ｜ 📅 之後 ｜ 🔭 願景 ｜ 🔴 高風險 ｜ ⚠️ over-build 警戒
 
