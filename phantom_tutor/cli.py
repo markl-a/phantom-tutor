@@ -43,12 +43,15 @@ def main(argv: list[str] | None = None) -> int:
     wk.add_argument("--n", type=int, default=10)
     sub.add_parser("stats", help="progress summary")
 
-    jb = sub.add_parser("jobs", help="job-funnel: ingest/demand/gap/rank/side-hustle")
+    jb = sub.add_parser("jobs",
+                        help="job-funnel: import-104/ingest/demand/gap/rank/side-hustle")
     jb.add_argument("action",
-                    choices=["ingest", "list", "demand", "gap", "rank", "side-hustle"])
-    jb.add_argument("--src", help="path to top200-style JSON (for ingest)")
+                    choices=["import-104", "ingest", "list", "demand", "gap",
+                             "rank", "side-hustle"])
+    jb.add_argument("--src", help="path to source CSV (import-104) or top200 JSON (ingest)")
     jb.add_argument("--tier", default=None, help="filter list by company_tier")
     jb.add_argument("--n", type=int, default=10)
+    jb.add_argument("--top", type=int, default=200, help="top-N to keep (import-104)")
 
     args = p.parse_args(argv)
     now = _now(args)
@@ -103,7 +106,19 @@ def main(argv: list[str] | None = None) -> int:
         print(f"topics={len(store)}  attempts={total}  avg_mastery={avg}")
         return 0
     if args.cmd == "jobs":
-        from . import jobs, paths, wealth
+        import json
+
+        from . import jobs, paths, sources_104, wealth
+        if args.action == "import-104":
+            top = sources_104.to_top200(args.src, top_n=args.top)
+            out = jobs.ingest_records(top)
+            print(f"ingested {len(out)} job(s) from 104 CSV -> {paths.jobs_path()}")
+            prof = paths.operator_profile_path()
+            if not prof.exists():
+                prof.write_text(json.dumps({"has_skills": [], "weak_or_missing": []},
+                                           indent=2, ensure_ascii=False), encoding="utf-8")
+                print(f"wrote profile template -> {prof} (fill in your skills)")
+            return 0
         if args.action == "ingest":
             out = jobs.ingest(args.src)
             print(f"ingested {len(out)} job(s) -> {paths.jobs_path()}")
