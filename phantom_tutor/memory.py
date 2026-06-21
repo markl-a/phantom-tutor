@@ -4,7 +4,7 @@ that Phase-2 re-points at phantom core owned-memory."""
 from __future__ import annotations
 
 import json
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -39,9 +39,10 @@ def record_attempt(key: str, dimension: str, score: float, now_iso: str,
     rec["mastery"] = round(0.6 * rec["mastery"] + 0.4 * float(score), 4)
     rec["streak"] = rec["streak"] + 1 if score >= srs.PASS_THRESHOLD else 0
     rec["last_seen"] = now_iso
-    interval = srs.next_interval_days(rec.get("interval", 0), float(score))
-    rec["interval"] = interval
-    rec["due"] = (date.fromisoformat(now_iso) + timedelta(days=interval)).isoformat()
+    card_dict, due_iso = srs.review(rec.get("fsrs"), float(score), now_iso)
+    rec["fsrs"] = card_dict
+    rec["due"] = due_iso
+    rec["interval"] = (date.fromisoformat(due_iso) - date.fromisoformat(now_iso)).days
     store[key] = rec
     save_store(store, path)
     _append_attempt(key, dimension, float(score), now_iso)
