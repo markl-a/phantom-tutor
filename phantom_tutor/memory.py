@@ -48,6 +48,25 @@ def record_attempt(key: str, dimension: str, score: float, now_iso: str,
     return {"key": key, **rec}
 
 
+def seed_weak_spot(key: str, dimension: str, mastery: float, now_iso: str,
+                   *, topic: str | None = None, path: Path | None = None) -> dict:
+    """Seed/refresh a weak_spot due immediately (for gap seeding from job demand).
+    Sets due=now_iso so `tutor today` surfaces it the same day; mastery reflects
+    current strength (lower = weaker = surfaced first). Unlike record_attempt this
+    does NOT count as a graded attempt or advance the SRS interval."""
+    store = load_store(path)
+    rec = store.get(key, {"topic": topic or key, "dimension": dimension,
+                          "mastery": 0.0, "interval": 0, "streak": 0,
+                          "attempts": 0, "last_seen": now_iso, "due": now_iso})
+    rec["topic"] = topic or rec.get("topic", key)
+    rec["dimension"] = dimension
+    rec["mastery"] = round(float(mastery), 4)
+    rec["due"] = now_iso
+    store[key] = rec
+    save_store(store, path)
+    return {"key": key, **rec}
+
+
 def _append_attempt(key: str, dimension: str, score: float, now_iso: str) -> None:
     """Append one append-only attempt line (review history; feeds future FSRS)."""
     p = paths.attempts_path()

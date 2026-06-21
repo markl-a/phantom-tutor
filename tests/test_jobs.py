@@ -86,3 +86,15 @@ def test_side_hustle_and_gap_are_symmetric():
     seeded = jobs.seed_weak_spots(js, profile, "2026-06-21")
     gaps = {s["topic"] for s in seeded}
     assert "python" in sell and "mlops" in gaps
+
+
+def test_seeded_gaps_are_due_same_day_weakest_first():
+    js = [{"job_id": "1", "skills_norm": ["python"], "themes": ["mlops", "mlops"]}]
+    profile = {"has_skills": ["python"], "weak_or_missing": ["mlops"]}
+    jobs.seed_weak_spots(js, profile, "2026-06-21", top_n=5)
+    due = memory.due_topics("2026-06-21")            # due ON the seeding day
+    keys = [d["key"] for d in due]
+    assert "mlops" in keys                            # real gap surfaces today
+    assert keys[0] == "mlops"                         # weakest (mastery 0) first
+    masteries = {d["key"]: d["mastery"] for d in due}
+    assert masteries["mlops"] == 0.0                  # mastery == coverage(0)

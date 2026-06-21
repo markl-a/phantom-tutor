@@ -36,5 +36,7 @@ def test_jobs_gap_seeds_today(tmp_path, capsys):
     cli.main(["jobs", "ingest", "--src", str(src)])
     capsys.readouterr()
     assert cli.main(["--now", "2026-06-21", "jobs", "gap"]) == 0
+    capsys.readouterr()                                  # discard gap output
     assert cli.main(["--now", "2026-06-21", "today"]) == 0
-    assert "platform" in capsys.readouterr().out or "python" in capsys.readouterr().out
+    today_out = capsys.readouterr().out
+    assert "platform" in today_out or "python" in today_out

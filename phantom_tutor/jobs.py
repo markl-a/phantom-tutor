@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from pathlib import Path
 
 from . import memory, paths
 
@@ -20,11 +21,13 @@ def load_jobs() -> list[dict]:
 def ingest(src_path: str) -> list[dict]:
     """Read a top200-style JSON list -> dedup by job_id -> drop agency noise ->
     persist to jobs.json. Returns the written records."""
-    raw = json.loads(open(src_path, encoding="utf-8").read())
+    raw = json.loads(Path(src_path).read_text(encoding="utf-8"))
     seen: set[str] = set()
     out: list[dict] = []
     for rec in raw:
         jid = rec.get("job_id")
+        if jid is None:
+            continue
         if jid in seen or rec.get("company_tier") == "agency":
             continue
         seen.add(jid)
@@ -65,8 +68,8 @@ def _coverage(skill: str, profile: dict) -> float:
 def seed_weak_spots(jobs: list[dict], profile: dict, now_iso: str,
                     *, top_n: int = 10) -> list[dict]:
     """Seed weak_spots from demand-supply gaps: priority = demand*(1-coverage).
-    Top-N gaps get a record_attempt(score=1-coverage) so `tutor today` surfaces
-    the most worth-training skills weakest-first. Returns the seeded records."""
+    Top-N gaps get a seed_weak_spot(mastery=coverage) due immediately so
+    `tutor today` surfaces them the same day weakest-first. Returns seeded records."""
     d = demand(jobs)
     scored = sorted(
         ((skill, freq, _coverage(skill, profile)) for skill, freq in d.items()),
@@ -74,8 +77,7 @@ def seed_weak_spots(jobs: list[dict], profile: dict, now_iso: str,
     )
     seeded: list[dict] = []
     for skill, _freq, cov in scored[:top_n]:
-        rec = memory.record_attempt(skill, "job-gap", round(1 - cov, 4), now_iso,
-                                    topic=skill)
+        rec = memory.seed_weak_spot(skill, "job-gap", cov, now_iso, topic=skill)
         seeded.append(rec)
     return seeded
 
