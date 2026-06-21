@@ -34,7 +34,8 @@ def test_review_interval_grows_on_repeated_pass():
 
 
 def test_review_is_deterministic():
-    assert srs.review(None, 1.0, "2026-06-10")[1] == srs.review(None, 1.0, "2026-06-10")[1]
+    # full card dict + due are reproducible (deterministic card_id, no fuzzing)
+    assert srs.review(None, 1.0, "2026-06-10") == srs.review(None, 1.0, "2026-06-10")
 
 
 def test_is_due():

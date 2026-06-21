@@ -28,7 +28,10 @@ def review(card: dict | None, score: float, now_iso: str) -> tuple[dict, str]:
     """Apply one graded review to an FSRS card (or a fresh one). Returns the
     updated card dict (for storage) and the next due date as YYYY-MM-DD. A None
     card seeds a fresh one — smoothly upgrading legacy SM-2 records on next review."""
-    c = Card.from_dict(card) if card else Card()
+    # Deterministic card_id (date-derived) so stored card state is reproducible and
+    # we skip fsrs.Card()'s wall-clock id + its per-card sleep. card_id is unused by
+    # the scheduler and we key cards by topic, so same-day collisions are harmless.
+    c = Card.from_dict(card) if card else Card(card_id=int(now_iso.replace("-", "")))
     when = datetime.fromisoformat(now_iso).replace(tzinfo=timezone.utc)
     c, _ = _scheduler.review_card(c, score_to_rating(score), review_datetime=when)
     return c.to_dict(), c.due.date().isoformat()

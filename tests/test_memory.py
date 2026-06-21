@@ -35,6 +35,17 @@ def test_record_attempt_stores_serializable_fsrs_card():
     Card.from_dict(rec["fsrs"])               # roundtrips back into an FSRS card
 
 
+def test_legacy_record_without_fsrs_card_upgrades_in_place():
+    # a pre-FSRS record (no "fsrs" key) must upgrade smoothly, preserving history
+    memory.save_store({"x": {"topic": "x", "dimension": "ML", "mastery": 0.5,
+                             "interval": 3, "streak": 1, "attempts": 2,
+                             "last_seen": "2026-06-01", "due": "2026-06-04"}})
+    rec = memory.record_attempt("x", "ML", score=1.0, now_iso="2026-06-10")
+    assert rec["attempts"] == 3          # preserved + incremented
+    assert "fsrs" in rec                 # upgraded with a fresh FSRS card
+    assert rec["due"] > "2026-06-10"
+
+
 def test_due_topics_and_list_weak():
     memory.record_attempt("a", "ML", score=0.2, now_iso="2026-06-10")   # weak, due 06-11
     memory.record_attempt("b", "ML", score=1.0, now_iso="2026-06-10")   # strong, due later
