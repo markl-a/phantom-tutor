@@ -18,17 +18,15 @@ def load_jobs() -> list[dict]:
     return json.loads(raw) if raw else []
 
 
-def ingest(src_path: str) -> list[dict]:
-    """Read a top200-style JSON list -> dedup by job_id -> drop agency noise ->
-    persist to jobs.json. Returns the written records."""
-    raw = json.loads(Path(src_path).read_text(encoding="utf-8"))
+def ingest_records(records: list[dict]) -> list[dict]:
+    """Dedup by job_id -> drop agency noise -> persist to jobs.json. Returns the
+    written records. Shared by ingest() (from a JSON file) and the 104 importer
+    (from in-memory records)."""
     seen: set[str] = set()
     out: list[dict] = []
-    for rec in raw:
+    for rec in records:
         jid = rec.get("job_id")
-        if jid is None:
-            continue
-        if jid in seen or rec.get("company_tier") == "agency":
+        if jid is None or jid in seen or rec.get("company_tier") == "agency":
             continue
         seen.add(jid)
         out.append(rec)
@@ -36,6 +34,11 @@ def ingest(src_path: str) -> list[dict]:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     return out
+
+
+def ingest(src_path: str) -> list[dict]:
+    """Read a top200-style JSON list and ingest it (see ingest_records)."""
+    return ingest_records(json.loads(Path(src_path).read_text(encoding="utf-8")))
 
 
 def demand(jobs: list[dict]) -> dict[str, int]:
