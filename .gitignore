@@ -7,3 +7,13 @@ venv/
 .ruff_cache/
 TASK-*.md
 .codex_prompt.txt
+
+# Private personal data (job-seeking analysis, never commit)
+personalized/
+
+# Loop scratch / multi-agent session artifacts (never push to public repo)
+.ai-shared/
+overnight/
+SESSION_RESUME.md
+cache/
+configs/agents.*.toml
