@@ -61,7 +61,7 @@
 
 | 命令 | 行為 |
 |---|---|
-| `tutor jobs import-104 --src <csv> [--n N]` | to_top200 → ingest;若無 operator_skills.json 寫空範本;印「ingested N / 寫了範本請填」 |
+| `tutor jobs import-104 --src <csv> [--top N]` | to_top200(top_n=N,預設 200) → ingest;若無 operator_skills.json 寫空範本;印「ingested N / 寫了範本請填」(`--top` 與顯示用的 `--n` 分開,避免 default 衝突) |
 
 (既有 `tutor jobs list/demand/gap/rank/side-hustle` 不變,直接在真實資料上跑。)
 

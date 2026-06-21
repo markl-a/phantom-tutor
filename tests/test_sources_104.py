@@ -93,6 +93,13 @@ def test_composite_ranks_and_truncates_top_n(tmp_path):
     assert [r["job_id"] for r in top1] == ["104-hi"]
 
 
+def test_rows_with_blank_job_id_are_skipped(tmp_path):
+    # a malformed export with blank 職缺ID must not collapse unrelated rows into one
+    rows = [_row(職缺ID="", 公司="A"), _row(職缺ID="", 公司="B"), _row(職缺ID="7", 公司="C")]
+    out = sources_104.to_top200(_write_csv(tmp_path, rows))
+    assert [r["job_id"] for r in out] == ["104-7"]
+
+
 def test_bom_present_in_fixture(tmp_path):
     # guard: the fixture really is BOM-prefixed (so we test the real read path)
     p = _write_csv(tmp_path, [_row(職缺ID="1")])

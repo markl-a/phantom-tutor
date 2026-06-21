@@ -118,6 +118,7 @@ def to_top200(csv_path: str, *, top_n: int = 200) -> list[dict]:
     """Read a 104 matched_v2 CSV (UTF-8 BOM) -> normalized records -> top-N by
     composite (05 rubric). Returns records ready for jobs.ingest."""
     with open(csv_path, encoding="utf-8-sig", newline="") as f:
-        records = [_record(row) for row in csv.DictReader(f)]
+        records = [_record(row) for row in csv.DictReader(f)
+                   if (row.get("職缺ID") or "").strip()]
     records.sort(key=lambda r: r["composite"], reverse=True)
     return records[:top_n]
