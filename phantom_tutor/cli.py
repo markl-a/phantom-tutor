@@ -109,6 +109,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ingested {len(out)} job(s) -> {paths.jobs_path()}")
             return 0
         data = jobs.load_jobs()
+        if args.action not in ("ingest", "list") and not data:
+            print("No jobs ingested yet — run `tutor jobs ingest --src <file>`.")
+            return 0
         if args.action == "list":
             for j in data:
                 if args.tier and j.get("company_tier") != args.tier:
