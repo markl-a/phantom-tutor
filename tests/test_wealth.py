@@ -44,11 +44,20 @@ def test_salary_bands():
 
 
 def test_weighted_score_formula():
-    s = wealth.wealth_score(_job(themes=["agent"], salary_hi=120000,
+    # agent -> W1 leverage; platform -> W2 durability (axes stay distinct)
+    s = wealth.wealth_score(_job(themes=["agent", "platform"], salary_hi=120000,
                                  salary_disclosed=True, match_score=80,
                                  company_tier="big"))
     # 3*5 + 2.5*5 + 2*5 + 2*5 = 47.5
     assert s["score"] == 47.5
+
+
+def test_axes_stay_distinct_agent_is_w1_not_w2():
+    # 'agent' is leverage (W1), not durability (W2): a pure agent-app theme must
+    # not auto-max W2 — keeps the durability axis discriminating.
+    s = wealth.wealth_score(_job(themes=["agent"]))
+    assert s["w1"] == 5
+    assert s["w2"] == 1
 
 
 def test_rank_puts_platform_above_pure_high_salary_app():

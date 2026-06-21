@@ -5,7 +5,7 @@ from __future__ import annotations
 
 W1_HIGH = {"agent", "runtime", "platform", "governance", "mlops", "infra"}
 W1_MID = {"llm", "rag"}
-W2_HIGH = {"agent", "platform", "infra", "system-design", "governance", "architect", "mlops"}
+W2_HIGH = {"platform", "infra", "system-design", "governance", "architect", "mlops"}
 W2_MID = {"rag", "application"}
 
 _MONTHS = 14  # TWD annual estimate = monthly * 14 (12 + ~2 months bonus)
