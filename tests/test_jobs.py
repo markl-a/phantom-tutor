@@ -25,3 +25,17 @@ def test_ingest_dedups_by_job_id_and_filters_agency(tmp_path):
 
 def test_load_jobs_missing_returns_empty():
     assert jobs.load_jobs() == []
+
+
+def test_demand_counts_skills_and_themes_descending():
+    js = [
+        {"job_id": "1", "skills_norm": ["python", "llm"], "themes": ["agent"]},
+        {"job_id": "2", "skills_norm": ["python"], "themes": ["agent", "mlops"]},
+        {"job_id": "3", "skills_norm": ["llm"], "themes": []},
+    ]
+    d = jobs.demand(js)
+    assert d["python"] == 2
+    assert d["agent"] == 2
+    assert d["llm"] == 2
+    assert d["mlops"] == 1
+    assert list(d.values()) == sorted(d.values(), reverse=True)
