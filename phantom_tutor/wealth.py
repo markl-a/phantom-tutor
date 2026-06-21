@@ -56,3 +56,10 @@ def wealth_score(job: dict) -> dict:
     w4 = _w4(job)
     score = round(3 * w1 + 2.5 * w2 + 2 * w3 + 2 * w4, 2)
     return {"w1": w1, "w2": w2, "w3": w3, "w4": w4, "score": score}
+
+
+def rank(jobs: list[dict]) -> list[dict]:
+    """Each job gets a 'wealth' sub-dict; sorted by wealth score descending.
+    This is the job-switch target list ('which job to move to')."""
+    scored = [{**j, "wealth": wealth_score(j)} for j in jobs]
+    return sorted(scored, key=lambda j: j["wealth"]["score"], reverse=True)

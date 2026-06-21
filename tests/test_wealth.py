@@ -49,3 +49,15 @@ def test_weighted_score_formula():
                                  company_tier="big"))
     # 3*5 + 2.5*5 + 2*5 + 2*5 = 47.5
     assert s["score"] == 47.5
+
+
+def test_rank_puts_platform_above_pure_high_salary_app():
+    platform = _job(title="platform", themes=["platform", "governance"],
+                    salary_hi=90000, salary_disclosed=True, match_score=70,
+                    company_tier="big")
+    pay_app = _job(title="app", themes=["rag", "application"],
+                   salary_hi=200000, salary_disclosed=True, match_score=70,
+                   company_tier="big")
+    ranked = wealth.rank([pay_app, platform])
+    assert ranked[0]["title"] == "platform"           # W1/W2 asymmetry wins
+    assert ranked[0]["wealth"]["score"] >= ranked[1]["wealth"]["score"]
