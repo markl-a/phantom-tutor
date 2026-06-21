@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Personal study assistant on phantom-mesh core"
 license = "Apache-2.0"
 requires-python = ">=3.11"
+dependencies = ["fsrs>=6.3.1,<7"]
 
 [project.scripts]
 tutor = "phantom_tutor.cli:main"
