@@ -64,3 +64,25 @@ def test_seed_weak_spots_seeds_highest_gap_first_into_memory():
 def test_load_profile_missing_returns_empty_lists():
     p = jobs.load_profile()
     assert p == {"has_skills": [], "weak_or_missing": []}
+
+
+def test_side_hustle_ranks_strong_in_demand_skills_excludes_real_gaps():
+    js = [
+        {"job_id": "1", "skills_norm": ["python", "python"], "themes": ["mlops"]},
+        {"job_id": "2", "skills_norm": ["python"], "themes": ["mlops"]},
+    ]
+    profile = {"has_skills": ["python"], "weak_or_missing": ["mlops"]}
+    out = jobs.side_hustle(js, profile, top_n=5)
+    skills = [r["skill"] for r in out]
+    assert skills[0] == "python"
+    assert "mlops" not in skills            # real gap -> can't sell -> excluded
+    assert out[0]["score"] == round(3 * 0.7, 4)
+
+
+def test_side_hustle_and_gap_are_symmetric():
+    js = [{"job_id": "1", "skills_norm": ["python", "mlops"], "themes": []}]
+    profile = {"has_skills": ["python"], "weak_or_missing": ["mlops"]}
+    sell = {r["skill"] for r in jobs.side_hustle(js, profile)}
+    seeded = jobs.seed_weak_spots(js, profile, "2026-06-21")
+    gaps = {s["topic"] for s in seeded}
+    assert "python" in sell and "mlops" in gaps
