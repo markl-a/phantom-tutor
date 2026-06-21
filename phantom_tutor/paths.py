@@ -24,3 +24,11 @@ def weak_spots_path() -> Path:
 
 def attempts_path() -> Path:
     return data_root() / "attempts.jsonl"
+
+
+def jobs_path() -> Path:
+    return data_root() / "jobs.json"
+
+
+def operator_profile_path() -> Path:
+    return data_root() / "operator_skills.json"

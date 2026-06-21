@@ -43,6 +43,13 @@ def main(argv: list[str] | None = None) -> int:
     wk.add_argument("--n", type=int, default=10)
     sub.add_parser("stats", help="progress summary")
 
+    jb = sub.add_parser("jobs", help="job-funnel: ingest/demand/gap/rank/side-hustle")
+    jb.add_argument("action",
+                    choices=["ingest", "list", "demand", "gap", "rank", "side-hustle"])
+    jb.add_argument("--src", help="path to top200-style JSON (for ingest)")
+    jb.add_argument("--tier", default=None, help="filter list by company_tier")
+    jb.add_argument("--n", type=int, default=10)
+
     args = p.parse_args(argv)
     now = _now(args)
 
@@ -95,4 +102,42 @@ def main(argv: list[str] | None = None) -> int:
         avg = round(sum(r["mastery"] for r in store.values()) / len(store), 3) if store else 0.0
         print(f"topics={len(store)}  attempts={total}  avg_mastery={avg}")
         return 0
+    if args.cmd == "jobs":
+        from . import jobs, paths, wealth
+        if args.action == "ingest":
+            out = jobs.ingest(args.src)
+            print(f"ingested {len(out)} job(s) -> {paths.jobs_path()}")
+            return 0
+        data = jobs.load_jobs()
+        if args.action not in ("ingest", "list") and not data:
+            print("No jobs ingested yet — run `tutor jobs ingest --src <file>`.")
+            return 0
+        if args.action == "list":
+            for j in data:
+                if args.tier and j.get("company_tier") != args.tier:
+                    continue
+                print(f"  {j.get('job_id',''):12s} [{j.get('company_tier','')}] "
+                      f"{j.get('title','')}")
+            return 0
+        if args.action == "demand":
+            for skill, freq in list(jobs.demand(data).items())[:args.n]:
+                print(f"  {skill:24s} {freq}")
+            return 0
+        if args.action == "gap":
+            profile = jobs.load_profile()
+            for s in jobs.seed_weak_spots(data, profile, now, top_n=args.n):
+                print(f"  {s['topic']:24s} mastery={s['mastery']:.2f} (due {s['due']})")
+            return 0
+        if args.action == "rank":
+            for j in wealth.rank(data)[:args.n]:
+                w = j["wealth"]
+                print(f"  {w['score']:5.1f}  {j.get('title','')}  "
+                      f"(W1={w['w1']} W2={w['w2']} W3={w['w3']} W4={w['w4']})")
+            return 0
+        if args.action == "side-hustle":
+            profile = jobs.load_profile()
+            for r in jobs.side_hustle(data, profile, top_n=args.n):
+                print(f"  {r['skill']:24s} demand={r['demand']} "
+                      f"coverage={r['coverage']} score={r['score']}")
+            return 0
     return 1
