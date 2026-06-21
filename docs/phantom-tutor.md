@@ -1,7 +1,7 @@
 # phantom-tutor — 唯一主文件
 
 > 本檔為 phantom-tutor 的**唯一主文件**;個人化求職資料在 gitignored 的 `personalized/`(**不在此**,也不會進公開文件);舊版見 `docs/_archive/`。
-> 對應狀態:`master` @ `8e08fca` — Phase-1 + Phase-2 皆已併入,一個真實的 `tutor` CLI 可端到端跑、28 passing tests、ruff clean。每個「已出貨」項都對應 `master` 上的真實 commit;`Planned-next` 以下才是未實作的方向。
+> 對應狀態:Phase-1 + Phase-2 已併入 `master`;jobs 層 + wealth-score 在 `feat/jobs-wealth-score` 分支。一個真實的 `tutor` CLI 可端到端跑、48 passing tests、ruff clean。每個「已出貨」項都對應真實 commit;`Planned-next` 以下才是未實作的方向。
 > 英文狀態 SSOT 細節以 `docs/_archive/ROADMAP.md`(歷史快照)為起點,當前以本檔為準。
 
 ## 目錄
@@ -159,15 +159,16 @@ flowchart LR
 | 沙箱 code-runner | `runner.py` — subprocess + timeout + pass-rate(built-out) | `f65c83d` |
 | 每日迴圈 + 內容層 | `tutor today / weak-spots / stats`;seed banks + `content/scenarios.md`(6 維度攻略) | `cd3a640` `90cb0f4` |
 | Phase-2 疊加深化 | seed banks knowledge 2→19 / coding 6 / design 4;`quiz --llm` 選用;`interview --turns N` 多輪(Phase-1 預設皆 byte-unchanged) | `f990361` `9dda855` `b0c0f05` `6c82433` |
+| ⭐ jobs 層 + wealth-score | `jobs.py` ingest(去重+濾 agency)/ demand 統計 / gap 播種(`tutor jobs gap`→`today` 同日重浮);`wealth.py` 四軸 wealth-score(`tutor jobs rank` = **跳槽** 目標排序,W1/W2 故意壓過薪資)+ **副業** 分析(`tutor jobs side-hustle` = demand×coverage 能賣的技能)。全 hermetic、合成 fixture、資料落 `data_root()` 不進 repo | `feat/jobs-wealth-score` 分支 |
 
-> 目前:**28 passing tests**、`tutor` CLI 7 個子指令、ruff clean。Phase-1 與 Phase-2 分支皆併入 `master`,工作樹乾淨。多數模式**刻意做得薄**(seed 規模內容 + 簡單評分);runner 與 SRS 是建得較完整的部分。
+> 目前:**48 passing tests**、`tutor` CLI 8 個子指令(含 `jobs` 一族)、ruff clean。Phase-1 與 Phase-2 併入 `master`;jobs 層 + wealth-score 在 `feat/jobs-wealth-score`。多數練習模式**刻意做得薄**(seed 規模內容 + 簡單評分);runner、SRS、jobs/wealth 是建得較完整的部分。gap/副業/跳槽 三訊號共用同一個 `_coverage` helper(gap=demand×(1−coverage)、副業=demand×coverage、跳槽=wealth-score 排序)。
 
 ### 🚧 階段一 — 便宜高值(先做,不需真錢/對外)
 
 | 目標 | 具體項 | 在哪做 | 風險 / 前置 |
 |---|---|---|---|
-| ⭐ wealth-score | 讀既有 scored-jobs CSV(命中分)**之上**疊一層四軸(薪資天花板 × 耐久性 × 既有槓桿 × 契合)薄評分函式;純讀 CSV + 評分函式,零爬取/零對外/零 ToS | 編排節點(Win);codex/claude 寫 · ≥2 AI 審 | 低。純加法。**別過度工程**——先用真實求職證明有用再談 LLM 細化 |
-| ⭐ FSRS 換手刻 SM-2 | `srs.py` 手刻 SM-2-lite → **adopt py-fsrs(MIT)**,走既有 `next_interval_days`/`is_due` 接縫,additive | 編排節點(Win);codex 寫(單檔機械改)· opencode/agy 審 | 低。py-fsrs 是新依賴 → 先 pin 版本、保留 stub 測試 hermetic;swap 須 byte-compatible 預設行為 |
+| ✅ wealth-score(**已出貨**) | 已實作為 `wealth.py` 四軸純函式 + `jobs.py` 資料層(見上方已出貨表)。下一步才是 LLM 細化四軸 + 接真實 scored-jobs 資料 | — | 已完成。**別過度工程**——先用真實求職證明有用再談 LLM 細化 |
+| ⭐ FSRS 換手刻 SM-2 | `srs.py` 手刻 SM-2-lite → **adopt py-fsrs(MIT)**,走既有 `next_interval_days`/`is_due` 接縫,additive;`attempts.jsonl` review 歷史已就位可餵 FSRS | 編排節點(Win);codex 寫(單檔機械改)· opencode/agy 審 | 低。py-fsrs 是新依賴 → 先 pin 版本、保留 stub 測試 hermetic;swap 須 byte-compatible 預設行為 |
 
 ### 📅 階段二 — 護城河旗艦(排後,牽涉 core 整合)
 
@@ -188,7 +189,7 @@ flowchart LR
 
 ### 明確尚未建置
 
-真 owned-memory backend(`memory.py` 仍為本地 JSON);wealth-score 與 `tutor jobs`;py-fsrs 替換(`srs.py` 仍手刻 SM-2-lite);governor/mesh 整合;任何對外取得/投遞路徑;進度視覺化。模式評分深度刻意延後。
+真 owned-memory backend(`memory.py` 仍為本地 JSON);py-fsrs 替換(`srs.py` 仍手刻 SM-2-lite);wealth-score 四軸的 LLM 細化 + 接真實 scored-jobs 資料(目前四軸為啟發式、走合成 fixture);mode 增強(`--job/--cluster`);governor/mesh 整合;任何對外取得/投遞路徑;進度視覺化。模式評分深度刻意延後。
 
 ---
 
