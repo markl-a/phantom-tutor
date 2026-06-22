@@ -10,7 +10,11 @@ import subprocess
 def complete(prompt: str, system: str | None = None) -> str:
     if os.environ.get("PHANTOM_TUTOR_STUB_LLM"):
         return _stub(prompt, system)
-    cmd = ["phantom", "exec", prompt]
+    cmd = ["phantom", "exec"]
+    provider = os.environ.get("PHANTOM_PROVIDER")
+    if provider:
+        cmd += ["--provider", provider]
+    cmd += [prompt]
     if system:
         cmd += ["--system", system]
     out = subprocess.run(cmd, capture_output=True, text=True, timeout=120, check=False)
