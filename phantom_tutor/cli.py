@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 from . import memory
 from .modes import knowledge
@@ -42,6 +44,28 @@ def main(argv: list[str] | None = None) -> int:
     wk = sub.add_parser("weak-spots", help="weakest topics")
     wk.add_argument("--n", type=int, default=10)
     sub.add_parser("stats", help="progress summary")
+
+    demo = sub.add_parser(
+        "demo-loop",
+        help="write a deterministic synthetic career-learning artifact bundle",
+    )
+    demo.add_argument("--out", type=Path, required=True)
+    demo.add_argument("--now", default=None, help="ISO date override for the bundle")
+
+    plan_demo = sub.add_parser(
+        "learning-plan-demo",
+        help="derive a deterministic synthetic learning-plan/evidence bundle",
+    )
+    plan_demo.add_argument("--source", type=Path, required=True)
+    plan_demo.add_argument("--out", type=Path, required=True)
+    plan_demo.add_argument("--horizon-days", type=int, default=14)
+
+    practice_scenario = sub.add_parser(
+        "practice-scenario",
+        help="write a deterministic weak-spot to practice evidence bundle",
+    )
+    practice_scenario.add_argument("--source", type=Path, required=True)
+    practice_scenario.add_argument("--out", type=Path, required=True)
 
     jb = sub.add_parser("jobs",
                         help="job-funnel: import-104/ingest/demand/gap/rank/side-hustle")
@@ -105,6 +129,39 @@ def main(argv: list[str] | None = None) -> int:
         avg = round(sum(r["mastery"] for r in store.values()) / len(store), 3) if store else 0.0
         print(f"topics={len(store)}  attempts={total}  avg_mastery={avg}")
         return 0
+    if args.cmd == "demo-loop":
+        from .demo_loop import write_synthetic_demo_loop
+
+        path = write_synthetic_demo_loop(out_root=args.out, now=now)
+        print(str(path))
+        return 0
+    if args.cmd == "learning-plan-demo":
+        from .learning_plan import write_learning_plan_bundle
+
+        try:
+            path = write_learning_plan_bundle(
+                source_bundle=args.source,
+                out_root=args.out,
+                horizon_days=args.horizon_days,
+            )
+        except (RuntimeError, ValueError) as exc:
+            print(f"tutor: {exc}", file=sys.stderr)
+            return 1
+        print(str(path))
+        return 0
+    if args.cmd == "practice-scenario":
+        from .practice_scenario import write_practice_scenario_bundle
+
+        try:
+            path = write_practice_scenario_bundle(
+                source_bundle=args.source,
+                out_root=args.out,
+            )
+        except (RuntimeError, ValueError) as exc:
+            print(f"tutor: {exc}", file=sys.stderr)
+            return 1
+        print(str(path))
+        return 0
     if args.cmd == "jobs":
         import json
 
@@ -156,3 +213,7 @@ def main(argv: list[str] | None = None) -> int:
                       f"coverage={r['coverage']} score={r['score']}")
             return 0
     return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
