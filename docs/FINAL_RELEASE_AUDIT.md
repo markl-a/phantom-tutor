@@ -2,7 +2,7 @@
 
 Status: release candidate approved and tagged.
 
-Date: 2026-06-26
+Date: 2026-06-27
 
 ## Scope
 
@@ -21,6 +21,22 @@ Result: `high_conf_secret_hits=0`.
 - Default runtime dependency: `fsrs>=6.3.1,<7`; metadata sample reviewed as `fsrs==6.3.1`, MIT.
 
 Direct default release-scope dependency/license review result: pass.
+
+## Install And Wheel Verification
+
+- Install dry-run: `python -m pip install -e . --dry-run --no-deps` passed and would install `phantom-tutor-0.1.0a0`.
+- Wheel build: `python -m pip wheel . --no-deps -w <temp>` passed and built `phantom_tutor-0.1.0a0-py3-none-any.whl`.
+- Editable install: `python -m pip install -e . --no-deps` passed.
+- Package-data check: wheel includes `content/knowledge/seed.json`, `content/coding/seed.json`, and `content/design/seed.json` so installed CLI modes can load public practice banks.
+- CLI help: `python -m phantom_tutor.cli --help` and installed `tutor --help` expose deterministic synthetic public demo paths.
+- Lint: `python -m ruff check phantom_tutor tests` passed.
+
+## Current Verification
+
+- `python -m pytest tests/test_packaging.py tests/test_release_prep_contract.py tests/test_open_source_contract.py -q`: 14 passed.
+- `python -m pytest -q`: 93 passed.
+- Deterministic public smoke: `phantom_tutor.cli demo-loop`, `learning-plan-demo`, and `practice-scenario` wrote manifests with synthetic/offline/no-private-data/no-live-LLM/practice-only boundaries.
+- High-confidence secret scan: `high_conf_secret_hits=0`.
 
 ## Remaining Publication Gates
 

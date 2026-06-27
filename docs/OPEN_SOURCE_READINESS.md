@@ -1,7 +1,7 @@
 # Open Source Readiness
 
 Project: `phantom-tutor`
-Current phase: P3 weak-spot-to-practice scenario proof slice verified
+Current phase: P4 installable public release candidate verified
 Master plan: `../../PHANTOM-SATELLITES-OPEN-SOURCE-MASTER-PLAN.md`
 
 ## Shipped Features
@@ -20,6 +20,7 @@ Master plan: `../../PHANTOM-SATELLITES-OPEN-SOURCE-MASTER-PLAN.md`
 - P3 weak-spot-to-practice scenario contract is documented in `docs/PRACTICE_SCENARIO_BUNDLE.md`.
 - `practice-scenario` accepts only safe synthetic `demo-loop` bundles and writes deterministic `practice-scenario.json`, `practice-evidence.json`, `summary.md`, and `manifest.json`.
 - `learning-plan-demo` and `practice-scenario` validate manifest artifact paths as bundle-relative and contained inside the source bundle before reading.
+- `pyproject.toml` defines installable package metadata for version `0.1.0a0`, Apache-2.0 license metadata, Python `>=3.11`, classifiers, project URLs, `fsrs` runtime dependency, dev extra, and packaged seed content.
 - Test suite baseline after P2 synthetic career loop additions: `python -m pytest -q` passed with 74 tests.
 - Test suite baseline after P2 learning-plan/evidence additions: `python -m pytest -q` passed with 78 tests.
 - Test suite baseline after P3 weak-spot-to-practice additions and manifest-path hardening: `python -m pytest -q` passed with 83 tests.
@@ -192,3 +193,26 @@ Evidence:
 - `python -m pytest -q`: 88 passed.
 
 Remaining P4 work: none for the approved release-candidate tag.
+
+## P4 Release-Prep Slice 5
+
+Status: installable public package gate added and ready with documented limitations.
+
+Evidence:
+- `pyproject.toml` defines `phantom-tutor` version `0.1.0a0`, Apache-2.0 license metadata, Python `>=3.11`, classifiers, project URLs, `fsrs` runtime dependency, dev extra, package discovery, package data, and console script.
+- Seed banks under `content/knowledge`, `content/coding`, and `content/design` are packaged so installed CLI modes can load the same public practice content as source checkouts.
+- `.github/workflows/ci.yml` now runs editable install, install dry-run, wheel build, ruff, deterministic demo/learning-plan/practice smokes, full `python -m pytest -q`, and release-prep gate.
+- `tests/test_packaging.py` verifies package metadata, console script, packaged seed content, and module help.
+- Current verification on 2026-06-27 is recorded in `docs/FINAL_RELEASE_AUDIT.md`.
+- `python -m pytest tests/test_packaging.py tests/test_release_prep_contract.py tests/test_open_source_contract.py -q`: 14 passed.
+- `python -m pytest -q`: 93 passed.
+- `python -m pip install -e . --dry-run --no-deps`: would install `phantom-tutor-0.1.0a0`.
+- `python -m pip wheel . --no-deps -w <temp>`: built `phantom_tutor-0.1.0a0-py3-none-any.whl`.
+- Wheel package-data verification: `content/knowledge/seed.json`, `content/coding/seed.json`, and `content/design/seed.json` are present.
+- `python -m ruff check phantom_tutor tests`: all checks passed.
+- `python -m pip install -e . --no-deps`: installed `phantom-tutor-0.1.0a0`.
+- Installed console script `tutor --help`: OK.
+- Deterministic demo/learning-plan/practice smoke wrote manifests with `data_policy=synthetic_only`, `private_data_included=false`, `external_network=false`, `llm_provider=stub_or_disabled`, and `anti_cheating_boundary=practice_only_no_live_interview_assistance`.
+- High-confidence secret scan: `high_conf_secret_hits=0`.
+
+Remaining P4 work: none for the installable public release-candidate gate; live job-board scraping, application submission, live LLM output, personalized data sync, and covert interview assistance remain out of public release scope.

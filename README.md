@@ -10,6 +10,7 @@
 
 ```powershell
 python -m pip install -e .
+python -m pip install -e . --dry-run --no-deps
 python -m pytest -q
 python -m phantom_tutor.cli --help
 ```
