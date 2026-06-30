@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -43,7 +44,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("today", help="what to review now (SRS due, weakest first)")
     wk = sub.add_parser("weak-spots", help="weakest topics")
     wk.add_argument("--n", type=int, default=10)
-    sub.add_parser("stats", help="progress summary")
+    stats = sub.add_parser("stats", help="progress summary")
+    stats.add_argument("--json", action="store_true", help="print stats as JSON")
 
     demo = sub.add_parser(
         "demo-loop",
@@ -127,6 +129,9 @@ def main(argv: list[str] | None = None) -> int:
         store = memory.load_store()
         total = sum(r["attempts"] for r in store.values())
         avg = round(sum(r["mastery"] for r in store.values()) / len(store), 3) if store else 0.0
+        if args.json:
+            print(json.dumps({"topics": len(store), "attempts": total, "avg_mastery": avg}))
+            return 0
         print(f"topics={len(store)}  attempts={total}  avg_mastery={avg}")
         return 0
     if args.cmd == "demo-loop":
@@ -163,8 +168,6 @@ def main(argv: list[str] | None = None) -> int:
         print(str(path))
         return 0
     if args.cmd == "jobs":
-        import json
-
         from . import jobs, paths, sources_104, wealth
         if args.action == "import-104":
             top = sources_104.to_top200(args.src, top_n=args.top)

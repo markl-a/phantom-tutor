@@ -1,3 +1,5 @@
+import json
+
 from phantom_tutor.cli import main
 
 
@@ -20,3 +22,15 @@ def test_weak_spots_and_stats(capsys):
     assert "softmax" in capsys.readouterr().out
     assert main(["stats"]) == 0
     assert "attempts" in capsys.readouterr().out.lower()
+
+
+def test_stats_json_outputs_machine_readable_summary(capsys):
+    main(["--now", "2026-06-10", "quiz", "--id", "k-softmax", "--answer", "no idea"])
+    capsys.readouterr()
+
+    assert main(["stats", "--json"]) == 0
+    stats = json.loads(capsys.readouterr().out)
+
+    assert stats["topics"] == 1
+    assert stats["attempts"] == 1
+    assert "avg_mastery" in stats
