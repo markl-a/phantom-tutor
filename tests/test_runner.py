@@ -7,6 +7,11 @@ TESTS = (
     "def test_pos():\n    assert add(2, 3) == 5\n"
     "def test_big():\n    assert add(10, 5) == 15\n"
 )
+PARTIAL_TESTS = (
+    "from solution import add\n"
+    "def test_pos():\n    assert add(2, 3) == 5\n"
+    "def test_negative():\n    assert add(2, -3) == -1\n"
+)
 
 
 def test_runner_scores_correct_solution_full():
@@ -17,6 +22,16 @@ def test_runner_scores_correct_solution_full():
 def test_runner_scores_wrong_solution_low():
     r = runner.run_code(SOLUTION_BAD, TESTS)
     assert r["passed"] == 0 and r["score"] == 0.0
+
+
+def test_runner_scores_partial_pass_rate():
+    r = runner.run_code("def add(a, b):\n    return a + b if b > 0 else 0\n", PARTIAL_TESTS)
+    assert r["passed"] == 1 and r["total"] == 2 and r["score"] == 0.5
+
+
+def test_runner_scores_zero_when_no_tests_collected():
+    r = runner.run_code(SOLUTION_OK, "from solution import add\n")
+    assert r["passed"] == 0 and r["total"] == 0 and r["score"] == 0.0
 
 
 def test_runner_times_out_gracefully():
